@@ -1,7 +1,7 @@
 # Arlo-Downloader
 
-[![](https://img.shields.io/docker/image-size/teslamate/teslamate/latest)](https://hub.docker.com/r/diaznet/arlo-downloader)
-[![](https://img.shields.io/docker/pulls/teslamate/teslamate?color=%23099cec)](https://hub.docker.com/r/diaznet/arlo-downloader)
+[![](https://img.shields.io/docker/image-size/diaznet/arlo-downloader/latest)](https://hub.docker.com/r/diaznet/arlo-downloader)
+[![](https://img.shields.io/docker/pulls/diaznet/arlo-downloader?color=%23099cec)](https://hub.docker.com/r/diaznet/arlo-downloader)
 
 Automatically download your videos from Arlo for long-term storage.
 
