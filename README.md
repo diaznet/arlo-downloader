@@ -1,7 +1,7 @@
 # Arlo-Downloader
 
-[![](https://img.shields.io/docker/image-size/teslamate/teslamate/latest)](https://hub.docker.com/r/diaznet/arlo-downloader)
-[![](https://img.shields.io/docker/pulls/teslamate/teslamate?color=%23099cec)](https://hub.docker.com/r/diaznet/arlo-downloader)
+[![](https://img.shields.io/docker/image-size/diaznet/arlo-downloader/latest)](https://hub.docker.com/r/diaznet/arlo-downloader)
+[![](https://img.shields.io/docker/pulls/diaznet/arlo-downloader?color=%23099cec)](https://hub.docker.com/r/diaznet/arlo-downloader)
 
 Automatically download your videos from Arlo for long-term storage.
 
@@ -48,6 +48,8 @@ This way your main account is not used by Arlo Downloader and access can be revo
 
 ### docker-compose
 
+Create a file called docker-compose.yml with the following content: 
+
 ```yaml
 version: "2.1"
 services:
@@ -60,6 +62,12 @@ services:
     volumes:
       - /path/to/videos:/media
     restart: unless-stopped
+```
+
+Start the docker containers with docker-compose up. To run the containers in the background add the -d flag:
+
+```bash
+docker-compose up -d
 ```
 
 ### docker cli
@@ -76,7 +84,7 @@ docker run -d \
 
 Once the container is started, it will first download into /path/to/videos all available recordings from the API.  
 If files already exist, they will not be replaced.  
-It will then run indefinitely and download any new recording as soon as it becomnes available in the API.
+It will then run indefinitely and download any new recording as soon as it becomes available in the API.
 
 
 
@@ -92,4 +100,4 @@ Any damage cannot be related back to the author.
 
 # Credits
 Author: Jeremy Diaz  
-This container uses [pyaarlo](https://github.com/twrecked/pyaarlo) library.
+This container uses [pyaarlo](https://github.com/twrecked/pyaarlo) 0.7.1.2 library.
