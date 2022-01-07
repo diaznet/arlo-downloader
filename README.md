@@ -64,10 +64,13 @@ This way your main account is not used by Arlo Downloader and access can be revo
 #### Environment variables from files (Docker secrets)
 You can set any environment variable from a file by using a special prepend FILE__.
 
-As an example, instead of using -e ARLO_PASSWORD:
+As an example, instead of using -e ARLO_PASSWORD, you can set the following environment variable:
 
+```bash
 -e FILE__ARLO_PASSWORD=/run/secrets/myarlopassword
-Will set the environment variable ARLO_PASSWORD based on the contents of the /run/secrets/myarlopassword file.
+```
+
+It will then set the environment variable ARLO_PASSWORD based on the contents of the /run/secrets/myarlopassword file.
 
 
 ### docker-compose
@@ -116,7 +119,7 @@ Default Naming scheme:
 
 ## Manual Script run
 
-If you wsish the script can also be ran manually.
+The script can also be ran manually.
 
 ```bash
 usage: arlo-downloader.py [-h] [-d] [-m SAVE_MEDIA_TO] [-t {PUSH,EMAIL}] [-s {push,imap}] [-r TFA_RETRIES]
