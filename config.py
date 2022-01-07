@@ -6,7 +6,7 @@ class Config:
     "tfa_type": "PUSH",
     "tfa_source": "push",
     "tfa_retries": 10,
-    "tfa_timeout": 5,
+    "tfa_delay": 5,
     "tfa_host": '',
     "tfa_username": '',
     "tfa_password": ''
@@ -17,7 +17,7 @@ class Config:
     "tfa_type",
     "tfa_source",
     "tfa_retries",
-    "tfa_timeout",
+    "tfa_delay",
     "tfa_host",
     "tfa_username",
     "tfa_password"

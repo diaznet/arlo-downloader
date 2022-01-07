@@ -33,10 +33,12 @@ def parse_arguments():
     parser.add_argument('-r',
                         '--tfa-retries',
                         help="Set TFA max retries (default = {}).".format(Config.config("tfa_retries")),
+                        type=int,
                         action='store')
-    parser.add_argument('-T',
-                        '--tfa-timeout',
-                        help="Set TFA timeout (default = {}).".format(Config.config("tfa_timeout")),
+    parser.add_argument('-D',
+                        '--tfa-delay',
+                        help="Set TFA delay between each check (default = {}).".format(Config.config("tfa_delay")),
+                        type=int,
                         action='store')
     parser.add_argument('-H',
                         '--tfa-host',
@@ -72,6 +74,7 @@ def Init():
     # set these from the environment to log in
     USERNAME = os.environ.get('ARLO_USERNAME', '_INVALID')
     PASSWORD = os.environ.get('ARLO_PASSWORD', '_INVALID')
+    print(Config.config('tfa_delay'))
     # log in
     # add `verbose_debug=True` to enable even more debugging
     # add `dump=True` to enable event stream packet dumps
@@ -79,7 +82,7 @@ def Init():
                         tfa_type=Config.config('tfa_type'),
                         tfa_source=Config.config('tfa_source'),
                         tfa_retries=Config.config('tfa_retries'),
-                        tfa_timeout=Config.config('tfa_timeout'),
+                        tfa_delay=Config.config('tfa_delay'),
                         tfa_host=Config.config('tfa_host'),
                         tfa_username=Config.config('tfa_username'),
                         tfa_password=Config.config('tfa_password'),
@@ -115,8 +118,8 @@ def main(arguments):
         Config.set("tfa_source", arguments.tfa_source)
     if arguments.tfa_retries:
         Config.set("tfa_retries", arguments.tfa_retries)
-    if arguments.tfa_timeout:
-        Config.set("tfa_timeout", arguments.tfa_timeout)
+    if arguments.tfa_delay:
+        Config.set("tfa_delay", arguments.tfa_delay)
     if arguments.tfa_host:
         Config.set("tfa_host", arguments.tfa_host)
     if arguments.tfa_username:
