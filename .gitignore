@@ -1,2 +1,3 @@
 media/
 docker-compose.yml
+__pycache__/
