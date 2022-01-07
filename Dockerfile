@@ -21,19 +21,20 @@ ENV TFA_TYPE=PUSH
 ENV TFA_SOURCE=push
 ENV TFA_RETRIES=10
 ENV TFA_DELAY=5
-ENV TFA_HOST=
-ENV TFA_USERNAME=
-ENV TFA_PASSWORD=
+ENV TFA_HOST=_invalid
+ENV TFA_USERNAME=_invalid
+ENV TFA_PASSWORD=_invalid
 
 ENTRYPOINT ["/entrypoint.sh"]
 
-CMD [ "python", "/arlo-downloader.py",                              \
-    "--save-media-to",  "/media/${Y}/${m}/${F}T${t}_${N}_${SN}.mp4",\
-    "--tfa-type",       "${TFA_TYPE}",                              \
-    "--tfa-source",     "${TFA_SOURCE}",                            \
-    "--tfa-retries",    "${TFA_RETRIES}",                           \
-    "--tfa-delay",      "${TFA_DELAY}",                             \
-    "--tfa-host",       "'${TFA_HOST}'",                            \
-    "--tfa-username",   "'{$TFA_USERNAME}'",                        \
-    "--tfa-password",   "'{$TFA_PASSWORD}'"                         \
+CMD [                                                                       \
+    "python",               "/arlo-downloader.py",                          \
+        "--save-media-to",  "'/media/${Y}/${m}/${F}T${t}_${N}_${SN}.mp4'",  \
+        "--tfa-type",       "${TFA_TYPE}",                                  \
+        "--tfa-source",     "${TFA_SOURCE}",                                \
+        "--tfa-retries",    "${TFA_RETRIES}",                               \
+        "--tfa-delay",      "${TFA_DELAY}",                                 \
+        "--tfa-host",       "${TFA_HOST}",                                  \
+        "--tfa-username",   "{$TFA_USERNAME}",                              \
+        "--tfa-password",   "{$TFA_PASSWORD}"                               \
     ]
