@@ -58,8 +58,9 @@ This way your main account is not used by Arlo Downloader and access can be revo
 | -e `TFA_RETRIES` | Arlo TFA retries. | 10 |
 | -e `TFA_DELAY` | Arlo TFA Delay between each check | 5 |
 | -e `TFA_HOST` | TFA_TYPE=EMAIL + TFA_SOURCE=imap only [Instructions](https://github.com/twrecked/pyaarlo#2fa-imap) | |
-| -e `TFA_USERNAME` | TFA_TYPE=EMAIL + TFA_SOURCE=imap only [Instructions](https://github.com/twrecked/pyaarlo#2fa-imap)  | |
-| -e `TFA_PASSWORD` | TFA_TYPE=EMAIL + TFA_SOURCE=imap only [Instructions](https://github.com/twrecked/pyaarlo#2fa-imap)  | |
+| -e `TFA_USERNAME` | TFA_TYPE=EMAIL + TFA_SOURCE=imap only [Instructions](https://github.com/twrecked/pyaarlo#2fa-imap) | |
+| -e `TFA_PASSWORD` | TFA_TYPE=EMAIL + TFA_SOURCE=imap only [Instructions](https://github.com/twrecked/pyaarlo#2fa-imap) | |
+| -e `DEBUG` | Set to 1 to enable debug logs | 0 |
 
 #### Environment variables from files (Docker secrets)
 You can set any environment variable from a file by using a special prepend FILE__.
@@ -115,7 +116,7 @@ It will then run indefinitely and download any new recording as soon as it becom
 
 Default Naming scheme:
 
-    <year>/<month_number>/<year>-<month_number>-<day_number>T<hour>:<minute>:<seconds>_<device_name>_<device_serial_number>.mp4
+    <year>/<month_number>/<year>-<month_number>-<day_number>T<hour>:<minute>:<seconds>_<device_name>_<device_serial_number>
 
 ## Manual Script run
 
@@ -129,7 +130,7 @@ Download records from Arlo Cameras.
 
 optional arguments:
   -h, --help            show this help message and exit
-  -d, --debug           Enable Debug messages
+  -d, --debug           Enable Debug messages. Can also be set with environment variable DEBUG=1
   -m SAVE_MEDIA_TO, --save-media-to SAVE_MEDIA_TO
                         Save Media naming scheme without extension (default = '/media/
                         ${Y}/${m}/${F}T${t}_${N}_${SN}')
@@ -157,7 +158,7 @@ Any damage cannot be related back to the author.
 
 # Todo's
 - Ability to customize video filenames / filepath
-- Ability to enable DEBUG with docker compose / run
+- ~~Ability to enable DEBUG with docker compose / run~~
 
 # Credits
 Author: Jeremy Diaz  

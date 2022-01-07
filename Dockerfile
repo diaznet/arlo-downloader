@@ -24,6 +24,7 @@ ENV TFA_DELAY=5
 ENV TFA_HOST=_invalid
 ENV TFA_USERNAME=_invalid
 ENV TFA_PASSWORD=_invalid
+ENV DEBUG=0
 
 ENTRYPOINT ["/entrypoint.sh"]
 

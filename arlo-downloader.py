@@ -15,7 +15,7 @@ def parse_arguments():
     parser.add_argument('-d',
                        '--debug',
                        action='store_true',
-                       help='Enable Debug messages')
+                       help='Enable Debug messages. Can also be set with environment variable DEBUG=1')
     parser.add_argument('-m',
                         '--save-media-to',
                         help="Save Media naming scheme without extension (default = \'{}\')".format(Config.config("save_media_to")),
@@ -129,6 +129,8 @@ def main(arguments):
     if arguments.tfa_password:
         Config.set("tfa_password", arguments.tfa_password)
     if arguments.debug:
+        set_logger(True)
+    elif (os.environ.get('DEBUG') and os.environ.get('DEBUG') == '1'):
         set_logger(True)
     else:
         set_logger(False)
