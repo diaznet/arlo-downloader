@@ -81,8 +81,8 @@ Create a file called docker-compose.yml with the following content:
 version: "2.1"
 services:
   arlo-downloader:
-    image: diaznet/arlo-downloader
-    container_name: arlo-downloader
+    image: diaznet/arlo-downloader:latest
+    container_name: arlo-downloader:latest
     environment:
       - ARLO_USERNAME=<api_username>
       - ARLO_PASSWORD=<password>
@@ -106,7 +106,7 @@ docker run -d \
   -e ARLO_PASSWORD=<password> \
   -v /path/to/videos:/media \
   --restart unless-stopped \
-  diaznet/arlo-downloader
+  diaznet/arlo-downloader:latest
 ```
 
 Once the container is started, it will first download into /path/to/videos all available recordings from the API.  
@@ -131,8 +131,8 @@ optional arguments:
   -h, --help            show this help message and exit
   -d, --debug           Enable Debug messages
   -m SAVE_MEDIA_TO, --save-media-to SAVE_MEDIA_TO
-                        Save Media naming scheme (default = '/media/
-                        ${Y}/${m}/${F}T${t}_${N}_${SN}.mp4')
+                        Save Media naming scheme without extension (default = '/media/
+                        ${Y}/${m}/${F}T${t}_${N}_${SN}')
   -t {PUSH,EMAIL}, --tfa-type {PUSH,EMAIL}
                         Set TFA type (default = 'PUSH')
   -s {push,imap}, --tfa-source {push,imap}

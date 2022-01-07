@@ -18,7 +18,7 @@ def parse_arguments():
                        help='Enable Debug messages')
     parser.add_argument('-m',
                         '--save-media-to',
-                        help="Save Media naming scheme (default = \'{}\')".format(Config.config("save_media_to")),
+                        help="Save Media naming scheme without extension (default = \'{}\')".format(Config.config("save_media_to")),
                         action='store')
     parser.add_argument('-t',
                         '--tfa-type',
@@ -63,7 +63,7 @@ def set_logger(dbg):
                         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                         datefmt="%Y-%m-%dT%H:%M:%S%z"
                         )
-    _LOGGER = logging.getLogger(__file__) 
+    _LOGGER = logging.getLogger(__name__) 
 
 def Init():
 
@@ -74,7 +74,9 @@ def Init():
     # set these from the environment to log in
     USERNAME = os.environ.get('ARLO_USERNAME', '_INVALID')
     PASSWORD = os.environ.get('ARLO_PASSWORD', '_INVALID')
-    print(Config.config('tfa_delay'))
+    
+    # Print configuration in DEBUG
+    for confItem in Config.dump_config().items(): logging.debug(confItem)
     # log in
     # add `verbose_debug=True` to enable even more debugging
     # add `dump=True` to enable event stream packet dumps

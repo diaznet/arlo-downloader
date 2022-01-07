@@ -2,7 +2,7 @@ import os
 
 class Config:
   __conf = {
-    "save_media_to": os.path.dirname(os.path.realpath(__file__)) + os.path.sep + "${Y}/${m}/${F}T${t}_${N}_${SN}.mp4",
+    "save_media_to": os.path.dirname(os.path.realpath(__file__)) + os.path.sep + "${Y}/${m}/${F}T${t}_${N}_${SN}",
     "tfa_type": "PUSH",
     "tfa_source": "push",
     "tfa_retries": 10,
@@ -25,6 +25,9 @@ class Config:
   @staticmethod
   def config(name):
     return Config.__conf[name]
+
+  def dump_config():
+    return Config.__conf
 
   @staticmethod
   def set(name, value):
