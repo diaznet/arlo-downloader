@@ -47,7 +47,7 @@ This way your main account is not used by Arlo Downloader and access can be revo
 | :----: | --- |
 | -e `ARLO_USERNAME` | The username required to access Arlo API |
 | -e `ARLO_PASSWORD` | The password for the username above |
-| -v `/media` | Storage for downloaded records |
+| -v `/records` | Storage for downloaded records |
 
 #### Optional
 
@@ -88,7 +88,7 @@ services:
       - ARLO_USERNAME=<api_username>
       - ARLO_PASSWORD=<password>
     volumes:
-      - /path/to/videos:/media
+      - /path/to/videos:/records
     restart: unless-stopped
 ```
 
@@ -105,7 +105,7 @@ docker run -d \
   --name=arlo-downloader \
   -e ARLO_USERNAME=<api_username> \
   -e ARLO_PASSWORD=<password> \
-  -v /path/to/videos:/media \
+  -v /path/to/videos:/records \
   --restart unless-stopped \
   diaznet/arlo-downloader:latest
 ```
@@ -132,7 +132,7 @@ optional arguments:
   -h, --help            show this help message and exit
   -d, --debug           Enable Debug messages. Can also be set with environment variable DEBUG=1
   -m SAVE_MEDIA_TO, --save-media-to SAVE_MEDIA_TO
-                        Save Media naming scheme without extension (default = '/media/
+                        Save Media naming scheme without extension (default = '/records/
                         ${Y}/${m}/${F}T${t}_${N}_${SN}')
   -t {PUSH,EMAIL}, --tfa-type {PUSH,EMAIL}
                         Set TFA type (default = 'PUSH')
