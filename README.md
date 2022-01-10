@@ -8,7 +8,7 @@ Automatically download your videos from Arlo for long-term storage.
 # Introduction
 
 In the free tier of Arlo, customers are entitled to keep up to 7 days of recording in Arlo "cloud" storage. After 7 days, the recordings are deleted.
-In order to ensure the camera recordings are permanently backup'ed, it is necessary to automate the downloading of the videos.
+In order to ensure the camera recordings are permanently backup'ed, we'll automate the downloading of the videos.
 
 # Features
 
