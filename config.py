@@ -2,7 +2,7 @@ import os
 
 class Config:
   __conf = {
-    "save_media_to": os.path.dirname(os.path.realpath(__file__)) + os.path.sep + "${Y}/${m}/${F}T${t}_${N}_${SN}",
+    "save_media_to": os.path.dirname(os.path.realpath(__file__)) + os.path.sep + "${Y}" + os.path.sep + "${m}" + os.path.sep + "${F}T${t}_${N}_${SN}",
     "tfa_type": "PUSH",
     "tfa_source": "push",
     "tfa_retries": 10,

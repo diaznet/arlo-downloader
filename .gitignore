@@ -1,3 +1,5 @@
 records/
 docker-compose.yml
 __pycache__/
+aarlo/
+.venv

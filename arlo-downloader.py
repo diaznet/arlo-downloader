@@ -78,7 +78,6 @@ def Init():
     # Print configuration in DEBUG
     for confItem in Config.dump_config().items(): logging.debug(confItem)
     # log in
-    # add `verbose_debug=True` to enable even more debugging
     # add `dump=True` to enable event stream packet dumps
     arlo = pyaarlo.PyArlo(username=USERNAME, password=PASSWORD,
                         tfa_type=Config.config('tfa_type'),
@@ -88,11 +87,11 @@ def Init():
                         tfa_host=Config.config('tfa_host'),
                         tfa_username=Config.config('tfa_username'),
                         tfa_password=Config.config('tfa_password'),
-                        synchronous_mode=True,
-                        save_state=False,
+                        synchronous_mode=False,
+                        mode_api='v2',
+                        save_state=True,
                         dump=False,
                         storage_dir='aarlo',
-                        verbose_debug=True,
                         save_media_to=Config.config('save_media_to'))
     if not arlo.is_connected:
         logging.info("failed to login({})".format(arlo._last_error))
