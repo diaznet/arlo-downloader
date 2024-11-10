@@ -2,9 +2,9 @@ name: Build and Push docker image on Dockerhub
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "feature/*" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "feature/*" ]
 
 jobs:
   build_push:
@@ -25,10 +25,11 @@ jobs:
           type=schedule
           type=ref,event=branch
           type=ref,event=pr
+          type=ref,event=tag
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
           type=semver,pattern={{major}}
-          type=sha      
+          type=sha
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
