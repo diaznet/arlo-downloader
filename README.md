@@ -62,8 +62,6 @@ This way your main account is not used by Arlo Downloader and access can be revo
 | -e `TFA_PASSWORD` | TFA_TYPE=EMAIL + TFA_SOURCE=imap only [Instructions](https://github.com/twrecked/pyaarlo#2fa-imap) | |
 | -e `DEBUG` | Set to 1 to enable debug logs | 0 |
 
-For more information regarding 2fa with pyaarlo library, please check [here |https://github.com/twrecked/pyaarlo#2fa].
-
 #### Environment variables from files (Docker secrets)
 You can set any environment variable from a file by using a special prepend FILE__.
 
