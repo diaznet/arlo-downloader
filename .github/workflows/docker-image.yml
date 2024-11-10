@@ -1,0 +1,33 @@
+name: Build and Push docker image on Dockerhub
+
+on:
+  push:
+    tags:
+      - '*'  # Trigger on any tag push
+
+jobs:
+  build_push:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # Log in to Docker Hub
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    # Checkout
+    - uses: actions/checkout@v4
+    # Build and push the Docker image
+    - name: Build and push the Docker image
+    # Build and push Docker image
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .  # Set the context to the current directory
+        tags: ${{ github.actor }}/${{ github.event.repository.name }}:${{ github.ref_name }}
+        push: true  # Push the image to Docker Hub
+    # Log-out of Docker Hub
+    - name: Log out of Docker Hub
+      run: docker logout

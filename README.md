@@ -53,7 +53,7 @@ This way your main account is not used by Arlo Downloader and access can be revo
 
 | Parameter | Function | Default |
 | :----: | --- | --- |
-| -e `TFA_TYPE` | Arlo TFA type. Currently only supports PUSH,EMAIL | PUSH |
+| -e `TFA_TYPE` | Arlo TFA type. Currently only supports push,email | push |
 | -e `TFA_SOURCE` | Arlo TFA type. Currently only supports push,imap | push |
 | -e `TFA_RETRIES` | Arlo TFA retries. | 10 |
 | -e `TFA_DELAY` | Arlo TFA Delay between each check | 5 |
@@ -61,6 +61,8 @@ This way your main account is not used by Arlo Downloader and access can be revo
 | -e `TFA_USERNAME` | TFA_TYPE=EMAIL + TFA_SOURCE=imap only [Instructions](https://github.com/twrecked/pyaarlo#2fa-imap) | |
 | -e `TFA_PASSWORD` | TFA_TYPE=EMAIL + TFA_SOURCE=imap only [Instructions](https://github.com/twrecked/pyaarlo#2fa-imap) | |
 | -e `DEBUG` | Set to 1 to enable debug logs | 0 |
+
+For more information regarding 2fa with pyaarlo library, please check [here |https://github.com/twrecked/pyaarlo#2fa].
 
 #### Environment variables from files (Docker secrets)
 You can set any environment variable from a file by using a special prepend FILE__.
@@ -83,6 +85,7 @@ version: "2.1"
 services:
   arlo-downloader:
     image: diaznet/arlo-downloader:latest
+    build: .
     container_name: arlo-downloader:latest
     environment:
       - ARLO_USERNAME=<api_username>
@@ -92,10 +95,12 @@ services:
     restart: unless-stopped
 ```
 
-Start the docker containers with docker-compose up. To run the containers in the background add the -d flag:
+Note: you are also going to need the various TFA_* environmetn variables if yu have 2FA activated on your account.
+
+Build and start the docker containers with docker-compose up. To run the containers in the background add the -d flag:
 
 ```bash
-docker-compose up -d
+docker-compose up --build -d
 ```
 
 ### docker cli
@@ -158,8 +163,7 @@ Any damage cannot be related back to the author.
 
 # Todo's
 - Ability to customize video filenames / filepath
-- ~~Ability to enable DEBUG with docker compose / run~~
 
 # Credits
 Author: Jeremy Diaz  
-This container uses [pyaarlo](https://github.com/twrecked/pyaarlo) 0.7.1.2 library.
+This container uses [pyaarlo](https://github.com/twrecked/pyaarlo) 0.8 library.
