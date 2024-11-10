@@ -19,8 +19,6 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
     # Checkout
     - uses: actions/checkout@v4
-    # Build and push the Docker image
-    - name: Build and push the Docker image
     # Build and push Docker image
     - name: Build and push Docker image
       uses: docker/build-push-action@v4
