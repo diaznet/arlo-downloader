@@ -14,7 +14,7 @@ In order to ensure the camera recordings are permanently backup'ed, we'll automa
 
 - Downloads all recordings available from Arlo cloud storage locally.
 - Handles TFA with EMAIL or PUSH methods (see below and [instructions](https://github.com/twrecked/pyaarlo#2fa-imap) for EMAIL type)
-
+- Handles custom file and path naming (See below and [Instructions](https://github.com/twrecked/pyaarlo#saving-media) for formatting)
 
 # Requirements
 
@@ -74,31 +74,36 @@ As an example, instead of using -e ARLO_PASSWORD, you can set the following envi
 It will then set the environment variable ARLO_PASSWORD based on the contents of the /run/secrets/myarlopassword file.
 
 
-### docker-compose
+### docker-compose (recommended)
 
 Create a file called docker-compose.yml with the following content: 
 
 ```yaml
-version: "2.1"
+version: "2"
 services:
   arlo-downloader:
     image: diaznet/arlo-downloader:latest
-    build: .
     container_name: arlo-downloader:latest
     environment:
-      - ARLO_USERNAME=<api_username>
-      - ARLO_PASSWORD=<password>
+      ARLO_USERNAME: <api_username>
+      ARLO_PASSWORD: <password>
+      MEDIA_FOLDER: "/records/example/$${Y}/$${m}/$${F}T$${t}_$${N}_$${SN}" # See format at https://github.com/twrecked/pyaarlo#saving-media
+      # Optional if you have 2FA activated on your account. Example with EMAIL method and imaps server
+      # See https://github.com/twrecked/pyaarlo#2fa-imap
+      TFA_TYPE: EMAIL
+      TFA_SOURCE: imap
+      TFA_HOST: mail.server.com:993
+      TFA_USERNAME: <email_username>
+      TFA_PASSWORD: <email_password>
     volumes:
       - /path/to/videos:/records
     restart: unless-stopped
 ```
 
-Note: you are also going to need the various TFA_* environmetn variables if yu have 2FA activated on your account.
-
-Build and start the docker containers with docker-compose up. To run the containers in the background add the -d flag:
+Start the docker containers with docker-compose up. To run the containers in the background add the -d flag:
 
 ```bash
-docker-compose up --build -d
+docker compose up -d
 ```
 
 ### docker cli

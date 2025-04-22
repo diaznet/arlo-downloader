@@ -2,4 +2,4 @@
 
 ## Reporting a Vulnerability
 
-For reporting a security vulnerability, please contact `security AT diaznet DOT fr`.
+For reporting a security vulnerability, please contact `security AT diaznet DOT ch`.
