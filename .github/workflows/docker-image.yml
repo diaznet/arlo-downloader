@@ -2,9 +2,9 @@ name: Build and Push docker image on Dockerhub
 
 on:
   push:
-    branches: [ "main", "feature/*", "maintenance/*" ]
+    branches: [ "feature/*", "maintenance/*" ]
   pull_request:
-    branches: [ "main", "feature/*", "maintenance/*" ]
+    branches: [ "feature/*", "maintenance/*" ]
   
 jobs:
   build_push:
