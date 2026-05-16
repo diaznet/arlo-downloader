@@ -132,26 +132,31 @@ def init() -> None:
     for conf_item in Config.dump_config().items():
         logging.debug(conf_item)
 
-    arlo = pyaarlo.PyArlo(
-        username=username,
-        password=password,
-        tfa_type=Config.config("tfa_type"),
-        tfa_source=Config.config("tfa_source"),
-        tfa_retries=Config.config("tfa_retries"),
-        tfa_delay=Config.config("tfa_delay"),
-        tfa_host=Config.config("tfa_host"),
-        tfa_username=Config.config("tfa_username"),
-        tfa_password=Config.config("tfa_password"),
-        synchronous_mode=False,
-        mode_api="v2",
-        save_state=True,
-        dump=False,
-        storage_dir="aarlo",
-        save_media_to=save_media_to,
-        cipher_list="default",
-        http_connections=5,
-        http_max_size=10,
-    )
+    pyaarlo_opts = {
+        "username": username,
+        "password": password,
+        "tfa_type": Config.config("tfa_type"),
+        "tfa_source": Config.config("tfa_source"),
+        "tfa_retries": Config.config("tfa_retries"),
+        "tfa_delay": Config.config("tfa_delay"),
+        "tfa_host": Config.config("tfa_host"),
+        "tfa_username": Config.config("tfa_username"),
+        "tfa_password": Config.config("tfa_password"),
+        "synchronous_mode": False,
+        "mode_api": "v2",
+        "save_state": True,
+        "dump": False,
+        "storage_dir": "aarlo",
+        "save_media_to": save_media_to,
+        "http_connections": 5,
+        "http_max_size": 10,
+    }
+
+    cipher_list = os.environ.get("CIPHER_LIST")
+    if cipher_list:
+        pyaarlo_opts["cipher_list"] = cipher_list
+
+    arlo = pyaarlo.PyArlo(**pyaarlo_opts)
     if not arlo.is_connected:
         logging.error("failed to login: %s", arlo._last_error)
         sys.exit(1)

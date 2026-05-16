@@ -62,6 +62,7 @@ This way your main account is not used by Arlo Downloader and access can be revo
 | -e `TFA_HOST` | TFA_TYPE=EMAIL + TFA_SOURCE=imap only [Instructions](https://github.com/twrecked/pyaarlo#2fa-imap) | |
 | -e `TFA_USERNAME` | TFA_TYPE=EMAIL + TFA_SOURCE=imap only [Instructions](https://github.com/twrecked/pyaarlo#2fa-imap) | |
 | -e `TFA_PASSWORD` | TFA_TYPE=EMAIL + TFA_SOURCE=imap only [Instructions](https://github.com/twrecked/pyaarlo#2fa-imap) | |
+| -e `CIPHER_LIST` | Override TLS cipher list (set to `default` if you get Cloudflare 403 errors) | |
 | -e `DEBUG` | Set to 1 to enable debug logs | 0 |
 
 #### Filename substitutions
