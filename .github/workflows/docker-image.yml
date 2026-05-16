@@ -2,13 +2,85 @@ name: Build and Push docker image on Dockerhub
 
 on:
   push:
-    branches: [ "main", "feature/*", "maintenance/*" ]
+    branches: ["main", "feature/*", "maintenance/*"]
+    tags: ["v*"]
   pull_request:
-    branches: [ "main", "feature/*", "maintenance/*" ]
+    branches: ["main"]
+  workflow_dispatch:
   
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - run: pip install ruff
+    - run: ruff check .
+    - run: ruff format --check .
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build test image
+      run: docker build -t arlo-downloader:test .
+
+    - name: Test - old config is rejected
+      run: |
+        output=$(docker run --rm \
+          -e 'MEDIA_FOLDER=/records/${Y}/${m}/${F}T${t}_${N}_${SN}' \
+          arlo-downloader:test 2>&1 || true)
+        echo "$output"
+        echo "$output" | grep -q "Breaking changes"
+
+    - name: Test - missing credentials are caught
+      run: |
+        output=$(docker run --rm \
+          -e MEDIA_FOLDER=/records \
+          arlo-downloader:test 2>&1 || true)
+        echo "$output"
+        echo "$output" | grep -q "ARLO_USERNAME and ARLO_PASSWORD environment variables are required"
+
+    - name: Test - new config produces correct save_media_to
+      run: |
+        output=$(docker run --rm \
+          -e MEDIA_FOLDER=/records \
+          -e 'FILENAME=${Y}/${m}/${F}T${t}_${N}_${SN}' \
+          -e ARLO_USERNAME=test@test.com \
+          -e ARLO_PASSWORD=testpass \
+          arlo-downloader:test 2>&1 || true)
+        echo "$output"
+        echo "$output" | grep -q 'save_media_to: /records/\${Y}/\${m}/\${F}T\${t}_\${N}_\${SN}'
+
+    - name: Test - defaults work when FILENAME is not set
+      run: |
+        output=$(docker run --rm \
+          -e MEDIA_FOLDER=/records \
+          -e ARLO_USERNAME=test@test.com \
+          -e ARLO_PASSWORD=testpass \
+          arlo-downloader:test 2>&1 || true)
+        echo "$output"
+        echo "$output" | grep -q 'save_media_to: /records/\${Y}/\${m}/\${F}T\${t}_\${N}_\${SN}'
+
+    - name: Test - custom filename pattern
+      run: |
+        output=$(docker run --rm \
+          -e MEDIA_FOLDER=/data \
+          -e 'FILENAME=${SN}/${F}_${t}' \
+          -e ARLO_USERNAME=test@test.com \
+          -e ARLO_PASSWORD=testpass \
+          arlo-downloader:test 2>&1 || true)
+        echo "$output"
+        echo "$output" | grep -q 'save_media_to: /data/\${SN}/\${F}_\${t}'
+
   build_push:
     runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
 
     steps:
 
@@ -16,15 +88,11 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        # list of Docker images to use as base name for tags
         images: |
           diaznet/arlo-downloader
           ghcr.io/diaznet/arlo-downloader
-        # generate Docker tags based on the following events/attributes
         tags: |
-          type=schedule
-          type=ref,event=branch
-          type=ref,event=pr
+          type=ref,event=branch,enable=${{ github.event_name != 'workflow_dispatch' }}
           type=ref,event=tag
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
@@ -38,33 +106,28 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    # Log in to Docker Hub
     - name: Log in to Docker Hub
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    # Log-in to GHCR.io
     - name: Login to GitHub Container Registry
-      uses: docker/login-action@v3.3.0
+      uses: docker/login-action@v3
       with:
         registry: ghcr.io
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}     
 
-    # Checkout
     - uses: actions/checkout@v4
 
-    # Build and push Docker image
     - name: Build and push Docker image
       uses: docker/build-push-action@v6
       with:
         context: .
-        push: ${{ github.event_name != 'pull_request' }}
+        push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
   
-    # Log-out of Docker Hub
     - name: Log out of Docker Hub
       run: docker logout

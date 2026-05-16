@@ -1,31 +1,22 @@
 FROM python:3.12-slim
 
-# Create the working directories
-RUN mkdir /arlo-downloader /records
+ENV PUID=1000
+ENV PGID=1000
 
-# Add user
-RUN useradd arlo-downloader
+RUN mkdir /arlo-downloader /records /arlo-downloader/aarlo && \
+    groupadd -g ${PGID} arlo-downloader && \
+    useradd -u ${PUID} -g arlo-downloader arlo-downloader && \
+    chown -R arlo-downloader:arlo-downloader /records /arlo-downloader
 
-# Switch to arlo-downloader directory
 WORKDIR /arlo-downloader
 
-COPY requirements.txt arlo-downloader.py config.py entrypoint.sh /arlo-downloader/
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Update PIP to latest version and install required package(s)
-RUN pip install --upgrade pip && pip install -r requirements.txt
+COPY arlo-downloader.py config.py entrypoint.sh ./
+RUN chmod +x entrypoint.sh
 
-# Setting our entrypoint
+USER arlo-downloader
+
 ENTRYPOINT ["/arlo-downloader/entrypoint.sh"]
-
-# Start the arlo-downloader.py script
-CMD [                                                                               \
-    "python",               "/arlo-downloader/arlo-downloader.py",                  \
-        "--save-media-to",  "${MEDIA_FOLDER:=/records/$$Y/$$m/$$FT$$t_$$N_$$SN}",   \
-        "--tfa-type",       "${TFA_TYPE:=PUSH}",                                    \
-        "--tfa-source",     "${TFA_SOURCE:=push}",                                  \
-        "--tfa-retries",    "${TFA_RETRIES:=10}",                                   \
-        "--tfa-delay",      "${TFA_DELAY:=5}",                                      \
-        "--tfa-host",       "${TFA_HOST:=_invalid}",                                \
-        "--tfa-username",   "${TFA_USERNAME:=###}",                                 \
-        "--tfa-password",   "${TFA_PASSWORD:=###}"                                  \
-    ]
