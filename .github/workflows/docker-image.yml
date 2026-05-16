@@ -2,7 +2,7 @@ name: Build and Push docker image on Dockerhub
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "feature/*", "maintenance/*"]
     tags: ["v*"]
   pull_request:
     branches: ["main"]
