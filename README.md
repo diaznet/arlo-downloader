@@ -19,7 +19,7 @@ In order to ensure the camera recordings are permanently backup'ed, we'll automa
 # Requirements
 
 - Arlo cameras and My Arlo account, obviously.
-- Docker _(if you are new to Docker, see [Installing Docker and Docker Compose](https://dev.to/rohansawant/installing-docker-and-docker-compose-on-the-raspberry-pi-in-5-simple-steps-3mgl))_
+- Docker or Podman _(if you are new to Docker, see [Installing Docker and Docker Compose](https://dev.to/rohansawant/installing-docker-and-docker-compose-on-the-raspberry-pi-in-5-simple-steps-3mgl))_
 - Arlo Mobile App, if using TFA with PUSH method.
 
 # Instructions
@@ -53,109 +53,173 @@ This way your main account is not used by Arlo Downloader and access can be revo
 
 | Parameter | Function | Default |
 | :----: | --- | --- |
-| -e `TFA_TYPE` | Arlo TFA type. Currently only supports push,email | push |
-| -e `TFA_SOURCE` | Arlo TFA type. Currently only supports push,imap | push |
-| -e `TFA_RETRIES` | Arlo TFA retries. | 10 |
-| -e `TFA_DELAY` | Arlo TFA Delay between each check | 5 |
+| -e `MEDIA_FOLDER` | Base folder for media storage | /records |
+| -e `FILENAME` | File naming pattern ([substitutions](https://github.com/twrecked/pyaarlo#saving-media)) | `${Y}/${m}/${F}T${t}_${N}_${SN}` |
+| -e `TFA_TYPE` | Arlo TFA type. Currently only supports PUSH, EMAIL | PUSH |
+| -e `TFA_SOURCE` | Arlo TFA source. Currently only supports push, imap | push |
+| -e `TFA_RETRIES` | Arlo TFA retries | 10 |
+| -e `TFA_DELAY` | Arlo TFA delay between each check | 5 |
 | -e `TFA_HOST` | TFA_TYPE=EMAIL + TFA_SOURCE=imap only [Instructions](https://github.com/twrecked/pyaarlo#2fa-imap) | |
 | -e `TFA_USERNAME` | TFA_TYPE=EMAIL + TFA_SOURCE=imap only [Instructions](https://github.com/twrecked/pyaarlo#2fa-imap) | |
 | -e `TFA_PASSWORD` | TFA_TYPE=EMAIL + TFA_SOURCE=imap only [Instructions](https://github.com/twrecked/pyaarlo#2fa-imap) | |
 | -e `DEBUG` | Set to 1 to enable debug logs | 0 |
 
-#### Environment variables from files (Docker secrets)
-You can set any environment variable from a file by using a special prepend FILE__.
+#### Filename substitutions
 
-As an example, instead of using -e ARLO_PASSWORD, you can set the following environment variable:
+The `FILENAME` parameter supports [pyaarlo substitutions](https://github.com/twrecked/pyaarlo#saving-media):
+
+| Token | Description |
+| :----: | --- |
+| `${SN}` | Device serial number |
+| `${N}` | Device name |
+| `${NN}` | Device name, lower case with _ replacing spaces |
+| `${Y}` | Year (4 digits) |
+| `${m}` | Month (01-12) |
+| `${d}` | Day (01-31) |
+| `${H}` | Hour (00-23) |
+| `${M}` | Minute (00-59) |
+| `${S}` | Second (00-59) |
+| `${F}` | Shortcut for `${Y}-${m}-${d}` |
+| `${T}` | Shortcut for `${H}:${M}:${S}` |
+| `${t}` | Shortcut for `${H}-${M}-${S}` |
+| `${s}` | Seconds since epoch |
+
+The file extension is added automatically by pyaarlo.
+
+#### Environment variables from files (Docker secrets)
+
+You can set any environment variable from a file by using a special prepend `FILE__`.
+
+As an example, instead of using `-e ARLO_PASSWORD`, you can set the following environment variable:
 
 ```bash
 -e FILE__ARLO_PASSWORD=/run/secrets/myarlopassword
 ```
 
-It will then set the environment variable ARLO_PASSWORD based on the contents of the /run/secrets/myarlopassword file.
-
+It will then set the environment variable `ARLO_PASSWORD` based on the contents of the `/run/secrets/myarlopassword` file.
 
 ### docker-compose (recommended)
 
-Create a file called docker-compose.yml with the following content: 
+1. Copy the example environment file and fill in your credentials:
+
+```bash
+cp .env.example .env
+# Edit .env with your real credentials
+```
+
+2. Create a file called `docker-compose.yml`:
 
 ```yaml
-version: "2"
 services:
   arlo-downloader:
     image: diaznet/arlo-downloader:latest
-    container_name: arlo-downloader:latest
+    container_name: arlo-downloader
+    env_file: .env
     environment:
-      ARLO_USERNAME: <api_username>
-      ARLO_PASSWORD: <password>
-      MEDIA_FOLDER: "/records/example/$${Y}/$${m}/$${F}T$${t}_$${N}_$${SN}" # See format at https://github.com/twrecked/pyaarlo#saving-media
-      # Optional if you have 2FA activated on your account. Example with EMAIL method and imaps server
-      # See https://github.com/twrecked/pyaarlo#2fa-imap
-      TFA_TYPE: EMAIL
-      TFA_SOURCE: imap
-      TFA_HOST: mail.server.com:993
-      TFA_USERNAME: <email_username>
-      TFA_PASSWORD: <email_password>
+      MEDIA_FOLDER: "/records"
+      FILENAME: "$${Y}/$${m}/$${F}T$${t}_$${N}_$${SN}"
+      # Optional: TFA with EMAIL method and IMAP server
+      # TFA_TYPE: EMAIL
+      # TFA_SOURCE: imap
+      # TFA_HOST: mail.server.com:993
+      # TFA_USERNAME: <email_username>
+      # TFA_PASSWORD: <email_password>
     volumes:
       - /path/to/videos:/records
+      - aarlo-state:/arlo-downloader/aarlo
     restart: unless-stopped
+
+volumes:
+  aarlo-state:
 ```
 
-Start the docker containers with docker-compose up. To run the containers in the background add the -d flag:
+> **Note:** Use `$$` to escape `$` in docker-compose environment values (e.g., `$${Y}` becomes `${Y}` inside the container).
+
+3. Start the container:
 
 ```bash
 docker compose up -d
 ```
 
-### docker cli
+### docker / podman cli
 
 ```bash
 docker run -d \
   --name=arlo-downloader \
   -e ARLO_USERNAME=<api_username> \
   -e ARLO_PASSWORD=<password> \
+  -e MEDIA_FOLDER=/records \
+  -e 'FILENAME=${Y}/${m}/${F}T${t}_${N}_${SN}' \
   -v /path/to/videos:/records \
+  -v aarlo-state:/arlo-downloader/aarlo \
   --restart unless-stopped \
   diaznet/arlo-downloader:latest
 ```
 
-Once the container is started, it will first download into /path/to/videos all available recordings from the API.  
+Once the container is started, it will first download into `/path/to/videos` all available recordings from the API.  
 If files already exist, they will not be replaced.  
 It will then run indefinitely and download any new recording as soon as it becomes available in the API.
 
-Default Naming scheme:
+Default naming scheme:
 
-    <year>/<month_number>/<year>-<month_number>-<day_number>T<hour>:<minute>:<seconds>_<device_name>_<device_serial_number>
+    <media_folder>/<year>/<month_number>/<year>-<month_number>-<day_number>T<hour>-<minute>-<seconds>_<device_name>_<device_serial_number>.mp4
 
 ## Manual Script run
 
-The script can also be ran manually.
+The script can also be run manually.
 
 ```bash
-usage: arlo-downloader.py [-h] [-d] [-m SAVE_MEDIA_TO] [-t {PUSH,EMAIL}] [-s {push,imap}] [-r TFA_RETRIES]
-                          [-T TFA_DELAY] [-H TFA_HOST] [-U TFA_USERNAME] [-P TFA_PASSWORD]
+usage: arlo-downloader.py [-h] [-d] [-m MEDIA_FOLDER] [-f FILENAME] [-t {PUSH,EMAIL}]
+                          [-s {push,imap}] [-r TFA_RETRIES] [-D TFA_DELAY]
+                          [-H TFA_HOST] [-U TFA_USERNAME] [-P TFA_PASSWORD]
 
 Download records from Arlo Cameras.
 
 optional arguments:
   -h, --help            show this help message and exit
   -d, --debug           Enable Debug messages. Can also be set with environment variable DEBUG=1
-  -m SAVE_MEDIA_TO, --save-media-to SAVE_MEDIA_TO
-                        Save Media naming scheme without extension (default = '/records/
-                        ${Y}/${m}/${F}T${t}_${N}_${SN}')
+  -m MEDIA_FOLDER, --media-folder MEDIA_FOLDER
+                        Base folder for media storage (default = './records')
+  -f FILENAME, --filename FILENAME
+                        File naming pattern using pyaarlo substitutions
+                        (default = '${Y}/${m}/${F}T${t}_${N}_${SN}')
   -t {PUSH,EMAIL}, --tfa-type {PUSH,EMAIL}
                         Set TFA type (default = 'PUSH')
   -s {push,imap}, --tfa-source {push,imap}
                         Set TFA source (default = 'push')
   -r TFA_RETRIES, --tfa-retries TFA_RETRIES
-                        Set TFA max retries (default = 10).
-  -T TFA_DELAY, --tfa-timeout TFA_TIMEOUT
-                        Set TFA timeout (default = 5).
+                        Set TFA max retries (default = 10)
+  -D TFA_DELAY, --tfa-delay TFA_DELAY
+                        Set TFA delay between each check (default = 5)
   -H TFA_HOST, --tfa-host TFA_HOST
-                        (EMAIL/imap only) Set TFA host (default = ).
+                        (EMAIL/imap only) Set TFA host
   -U TFA_USERNAME, --tfa-username TFA_USERNAME
-                        (EMAIL/imap only) Set TFA username (default = ).
+                        (EMAIL/imap only) Set TFA username
   -P TFA_PASSWORD, --tfa-password TFA_PASSWORD
-                        (EMAIL/imap only) Set TFA password (default = ).
+                        (EMAIL/imap only) Set TFA password
+```
+
+Example:
+
+```bash
+export ARLO_USERNAME=<your_username>
+export ARLO_PASSWORD=<your_password>
+python arlo-downloader.py -m "./records" -f '${Y}/${m}/${F}T${t}_${N}_${SN}' -t EMAIL -s imap -H mail.server.com:993 -U <email> -P <password>
+```
+
+# Development
+
+Install dev dependencies:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+Run linting:
+
+```bash
+ruff check .
+ruff format --check .
 ```
 
 # Disclaimer
@@ -164,9 +228,7 @@ This application comes without warranty.
 Please use with care.
 Any damage cannot be related back to the author.
 
-# Todo's
-- Ability to customize video filenames / filepath
-
 # Credits
+
 Author: Jeremy Diaz  
 This container uses [pyaarlo](https://github.com/twrecked/pyaarlo) 0.8 library.

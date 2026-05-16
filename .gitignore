@@ -2,5 +2,6 @@ records/
 docker-compose.yml
 __pycache__/
 aarlo/
-venv
+venv/
+.env
 arlo-downloader.code-workspace

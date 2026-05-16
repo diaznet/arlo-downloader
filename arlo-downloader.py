@@ -33,8 +33,12 @@ def parse_arguments() -> Namespace:
                         action='store_true',
                         help='Enable Debug messages. Can also be set with environment variable DEBUG=1')
     parser.add_argument('-m',
-                        '--save-media-to',
-                        help=f"Save Media naming scheme without extension (default = '{Config.config("save_media_to")}').",
+                        '--media-folder',
+                        help=f"Base folder for media storage (default = '{Config.config("media_folder")}').",
+                        action='store')
+    parser.add_argument('-f',
+                        '--filename',
+                        help=f"File naming pattern using pyaarlo substitutions (default = '{Config.config("filename")}').",
                         action='store')
     parser.add_argument('-t',
                         '--tfa-type',
@@ -97,14 +101,20 @@ def init() -> None:
         logging.info("attribute_changed: %s:%s:%s", device.name, attr, str(value)[:80])
 
     # set these from the environment to log in
-    username = os.environ.get('ARLO_USERNAME', '_INVALID')
-    password = os.environ.get('ARLO_PASSWORD', '_INVALID')
+    username = os.environ.get('ARLO_USERNAME')
+    password = os.environ.get('ARLO_PASSWORD')
+
+    if not username or not password:
+        logging.error("ARLO_USERNAME and ARLO_PASSWORD environment variables are required")
+        sys.exit(1)
+
+    save_media_to = Config.save_media_to()
+    logging.info("save_media_to: %s", save_media_to)
 
     # Print configuration in DEBUG
     for conf_item in Config.dump_config().items():
         logging.debug(conf_item)
-    # log in
-    # add `dump=True` to enable event stream packet dumps
+
     arlo = pyaarlo.PyArlo(username=username, password=password,
                           tfa_type=Config.config('tfa_type'),
                           tfa_source=Config.config('tfa_source'),
@@ -118,10 +128,13 @@ def init() -> None:
                           save_state=True,
                           dump=False,
                           storage_dir='aarlo',
-                          save_media_to=Config.config('save_media_to'))
+                          save_media_to=save_media_to,
+                          cipher_list='default',
+                          http_connections=5,
+                          http_max_size=10)
     if not arlo.is_connected:
-        logging.info("failed to login: %s", arlo._last_error)
-        sys.exit(-1)
+        logging.error("failed to login: %s", arlo._last_error)
+        sys.exit(1)
 
     # get base stations, list their statuses, register state change callbacks
     for base in arlo.base_stations:
@@ -129,10 +142,15 @@ def init() -> None:
         base.add_attr_callback('*', attribute_changed)
 
     # get cameras, list their statuses, register state change callbacks
-    # * is any callback, you can use motionDetected just to get motion events
     for camera in arlo.cameras:
         logging.info("camera: name=%s,device_id=%s,state=%s", camera.name, camera.device_id, camera.state)
         camera.add_attr_callback('*', attribute_changed)
+
+
+async def run_forever():
+    """Keep the event loop running until interrupted."""
+    while True:
+        await asyncio.sleep(3600)
 
 
 def main(args: Namespace):
@@ -143,9 +161,10 @@ def main(args: Namespace):
         args (Namespace): A Namespace containing all arguments
     """
 
-    loop = asyncio.get_event_loop()
-    if args.save_media_to:
-        Config.set("save_media_to", args.save_media_to)
+    if args.media_folder:
+        Config.set("media_folder", args.media_folder)
+    if args.filename:
+        Config.set("filename", args.filename)
     if args.tfa_type:
         Config.set("tfa_type", args.tfa_type)
     if args.tfa_source:
@@ -160,19 +179,16 @@ def main(args: Namespace):
         Config.set("tfa_username", args.tfa_username)
     if args.tfa_password:
         Config.set("tfa_password", args.tfa_password)
-    if args.debug:
-        set_logger(True)
-    elif (os.environ.get('DEBUG') and os.environ.get('DEBUG') == '1'):
+    if args.debug or os.environ.get('DEBUG') == '1':
         set_logger(True)
     else:
         set_logger(False)
+
+    init()
     try:
-        init()
-        loop.run_forever()
+        asyncio.run(run_forever())
     except KeyboardInterrupt:
         sys.exit(0)
-    finally:
-        loop.close()
 
 
 if __name__ == "__main__":

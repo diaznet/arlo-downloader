@@ -1,0 +1,13 @@
+records*
+aarlo/
+venv/
+.git/
+.github/
+__pycache__/
+*.code-workspace
+.env
+docker-compose.yml
+test-windows.bat
+LICENSE
+README.md
+SECURITY.md

@@ -17,7 +17,8 @@ class Config:
     """
 
     __conf = {
-      "save_media_to": os.path.dirname(os.path.realpath(__file__)) + os.path.sep + "${Y}" + os.path.sep + "${m}" + os.path.sep + "${F}T${t}_${N}_${SN}",
+      "media_folder": os.path.dirname(os.path.realpath(__file__)) + os.path.sep + "records",
+      "filename": "${Y}/${m}/${F}T${t}_${N}_${SN}",
       "tfa_type": "PUSH",
       "tfa_source": "push",
       "tfa_retries": 10,
@@ -27,8 +28,8 @@ class Config:
       "tfa_password": ''
     }
     __setters = [
-      "set_logger",
-      "save_media_to",
+      "media_folder",
+      "filename",
       "tfa_type",
       "tfa_source",
       "tfa_retries",
@@ -53,6 +54,16 @@ class Config:
         return Config.__conf[name]
 
     @staticmethod
+    def save_media_to() -> str:
+        """
+        Returns the full save_media_to path for pyaarlo (media_folder + filename).
+
+        Returns:
+            str: combined path
+        """
+        return Config.__conf["media_folder"] + "/" + Config.__conf["filename"]
+
+    @staticmethod
     def dump_config() -> dict:
         """
         Dumps the whole config
@@ -66,14 +77,14 @@ class Config:
     @staticmethod
     def set(name, value):
         """
-        _summary_
+        Sets a config value.
 
         Args:
-            name (_type_): _description_
-            value (_type_): _description_
+            name (str): config key
+            value: config value
 
         Raises:
-            NameError: _description_
+            NameError: if name is not in allowed setters
         """
 
         if name in Config.__setters:
