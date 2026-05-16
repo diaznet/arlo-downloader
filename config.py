@@ -17,27 +17,27 @@ class Config:
     """
 
     __conf = {
-      "media_folder": os.path.dirname(os.path.realpath(__file__)) + os.path.sep + "records",
-      "filename": "${Y}/${m}/${F}T${t}_${N}_${SN}",
-      "tfa_type": "PUSH",
-      "tfa_source": "push",
-      "tfa_retries": 10,
-      "tfa_delay": 5,
-      "tfa_host": '',
-      "tfa_username": '',
-      "tfa_password": ''
+        "media_folder": os.path.dirname(os.path.realpath(__file__)) + os.path.sep + "records",
+        "filename": "${Y}/${m}/${F}T${t}_${N}_${SN}",
+        "tfa_type": "PUSH",
+        "tfa_source": "push",
+        "tfa_retries": 10,
+        "tfa_delay": 5,
+        "tfa_host": "",
+        "tfa_username": "",
+        "tfa_password": "",
     }
     __setters = [
-      "media_folder",
-      "filename",
-      "tfa_type",
-      "tfa_source",
-      "tfa_retries",
-      "tfa_delay",
-      "tfa_host",
-      "tfa_username",
-      "tfa_password"
-      ]
+        "media_folder",
+        "filename",
+        "tfa_type",
+        "tfa_source",
+        "tfa_retries",
+        "tfa_delay",
+        "tfa_host",
+        "tfa_username",
+        "tfa_password",
+    ]
 
     @staticmethod
     def config(name: str) -> str:
