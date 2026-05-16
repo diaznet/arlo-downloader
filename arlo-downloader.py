@@ -113,10 +113,6 @@ def init() -> None:
     Initializes the connection to arlo and traps
     """
 
-def init() -> None:
-    """
-    Initializes the connection to arlo and traps
-    """
     # code to trap when attributes change
     def attribute_changed(device, attr, value):
         logging.info("attribute_changed: %s:%s:%s", device.name, attr, str(value)[:80])
