@@ -1,2 +1,2 @@
-pyaarlo==0.8.0.15
+pyaarlo==0.8.0.21
 python-slugify==8.0.4
